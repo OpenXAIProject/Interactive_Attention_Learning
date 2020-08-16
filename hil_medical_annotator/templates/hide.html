@@ -1,0 +1,438 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Bar Chart</title>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+  <style>
+    table {
+      background: #f5f5f5;
+      font-size: 18px;
+      margin-left: 40px;
+      width: 1450px;
+      table-layout: fixed;
+      border-collapse: seperate;
+      border: 1px solid block;
+    }
+   
+    td {
+      border: 1px solid black;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    span {
+      display: inline-block;
+      text-align: left;
+      white-space: nowrap;
+    }
+ 
+    input[type=checkbox]
+    {
+    /* Double-sized Checkboxes */
+      -ms-transform: scale(1.5); /* IE */
+      -moz-transform: scale(1.5); /* FF */
+      -webkit-transform: scale(1.5); /* Safari and Chrome */
+      -o-transform: scale(1.5); /* Opera */
+      padding: 10px;
+    }
+    input[type=submit] 
+    {
+        border: none;
+        height: 50px;
+        width: 200px;
+        font-size: 20px
+    }
+
+    input[type=text]
+    {
+        text-indent: 10px;
+        border: 1px solid #555;
+        font: 18px "Arial";
+    }
+
+    textarea
+    {
+        font-size: 20px;
+    }
+  </style>
+  </head>
+
+
+
+
+  <body>
+    <br>
+    <div class="row">
+      <div class="col-lg-1"></div>
+      <div class="col-lg-10">
+        <div class="col-lg-12">
+
+
+          <!-- show Disease Tab -->
+          <div class="form-group">
+            <h3 style="margin-left: 20px; display:inline-block">Disease : {{disease_name}}</h3>
+
+            <!-- go to previous disease -->
+            <form action="{{url_for('disease_search')}}" method="get" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n - disease_offset}}">
+              <input style="margin-left: 5em;" type="submit" value="Previous">
+            </form>
+
+            <!-- go to next disease -->
+            <form action="{{url_for('disease_search')}}" method="get" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n + disease_offset}}">
+              <input style="margin-left: 10px;" type="submit" value="   Next   ">
+            </form>  
+          </div>
+
+          
+          <!-- show Patient ID Tab -->
+          <div class="form-group">
+            <h3 style="margin-left: 20px; display:inline-block;">Patient ID : {{patient_id}} </h3>
+
+            <!-- go to previous patient-->
+            <form action="{{url_for('patient_search')}}" method="get" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n-1}}">
+              <input style="margin-left: 203px;" type="submit" value="Previous">
+            </form>
+
+            <!-- go to next patient -->
+            <form action="{{url_for('patient_search')}}" method="get" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n+1}}">
+              <input style="margin-left: 10px;" type="submit" value="   Next   ">
+            </form>  
+          </div>
+
+                   
+          <h3 style="margin-left: 20px;">Patient label : {{patient_label}}</h3>
+          <h3 style="margin-left: 20px;">Record Year : {{patient_year}}</h3>
+          <div class="btn-group" role="group" style="width: 500px; height: 50px; margin-left: 20px">
+            <form action="{{url_for('button_year')}}" method="post" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n}}">
+              <input type="hidden" name="y" value="3">
+              <button style="width:100px;" {{current_year_act[0]}}>{{current_year_str[0]}}</button>
+            </form>
+
+            <form action="{{url_for('button_year')}}" method="post" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n}}">
+              <input type="hidden" name="y" value="2">
+              <button style="width:100px;" {{current_year_act[1]}}>{{current_year_str[1]}}</button>
+            </form>
+
+            <form action="{{url_for('button_year')}}" method="post" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n}}">
+              <input type="hidden" name="y" value="1">
+              <button style="width:100px;" {{current_year_act[2]}}>{{current_year_str[2]}}</button>
+            </form>
+
+            <form action="{{url_for('button_year')}}" method="post" style="display:inline-block;" autocomplete="off">
+              <input type="hidden" name="n" value="{{n}}">
+              <input type="hidden" name="y" value="0">
+              <button style="width:100px;" {{current_year_act[3]}}>{{current_year_str[3]}}</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+   
+    <br>
+
+
+
+    <!-- read mode -->
+    <div class="form-group">
+      <!-- go to read mode-->
+      <form action="{{url_for('read_non_hide')}}" method="get" style="display:inline-block;" autocomplete="off">
+        <div class="row">
+          <div class="col-lg-1"></div>
+          <div class="col-lg-10">
+            <div class="col-lg-12">
+              <input type="hidden" name="n" value="{{n}}">
+              <input type="submit" style="margin-left: 230px; font-size: 32px; font-weight: bold; height:80px; width:300px; color: gray; border-style: solid; border-width: 5px; border-radius: 20px; border-color: black;" value="View All Features">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+ 
+
+
+    <form action="{{url_for('cf_estimation')}}" method="post" autocomplete="off">
+      <div class="row">
+        <div class="col-lg-1"></div>
+        <div class="col-lg-10">
+          <div class="col-lg-12">
+            <input type="hidden" name="n" value="{{n}}">
+            <input type="submit" style="position: absolute; top:1030px; z-index:1; left:2150px; font-size: 40px; font-weight: bold; height: 80px; width: 250px; color: black; border-style: solid; border-width: 5px; border-radius: 20px;" value="Execute">
+          </div>
+        </div>
+      </div> 
+      <br>
+      <br>
+
+      <div>
+        {% if graph_mask[0] %}
+        <!-- Graph1 -->
+        <div class="row" style="margin-top: 50px;">
+          <div class="col-lg-1"></div>
+          <div class="col-lg-10" style="background-color: white; padding: 30px 30px 0px 50px;">
+            <div class="row">
+              <div class="col-lg-12" style="font-size: 36px; background-color: white">
+                <strong>Graph1</strong>
+                <strong style="margin-left: 1600px; display:inline-block;">Counterfactual Estimation</strong>
+              </div>
+            </div>
+
+
+            <div class="row">
+              <div class="col-lg-12" style="background-color: white; padding-top: 20px; height: 800px;">
+
+                  <canvas id="canvas_1" style="display:inline-block; height: 800px; width: 1500px;"></canvas> 
+                  <canvas id="cf_canvas_1" style="position: absolute; top:80px; left: 1600px; height: 400px; width:500px;"></canvas> 
+                  <strong style="position: absolute; top: 150px; left: 2140px; display:inline; font-size: 24px;">Feature importance</strong>
+                  <strong style="position: absolute; top: 200px; left: 2100px; display:inline; font-size: 32px;"><u>{{cf_feature_name}}</u></strong>
+                  <strong style="position: absolute; top: 250px; left: 2220px; display:inline; font-size: 40px;"><u>{{cf_feature_value}}</u></strong>
+
+                  <input style="position: absolute; top:550px; left:1680px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="1" {{cf_checkbox_list[0]}}>
+                  <strong style="position: absolute; top:600px; left:1640px; display:inline; font-size: 20px;">{% for param in feature_name_list[0] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:550px; left:1880px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="2" {{cf_checkbox_list[1]}}>
+                  <strong style="position: absolute; top:600px; left:1840px; display:inline; font-size: 20px;">{% for param in feature_name_list[1] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:550px; left:2080px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="3" {{cf_checkbox_list[2]}}>
+                  <strong style="position: absolute; top:600px; left:2040px; display:inline; font-size: 20px;">{% for param in feature_name_list[2] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:550px; left:2280px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="4" {{cf_checkbox_list[3]}}>
+                  <strong style="position: absolute; top:600px; left:2240px; display:inline; font-size: 20px;">{% for param in feature_name_list[3] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:700px; left:1680px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="5" {{cf_checkbox_list[4]}}>
+                  <strong style="position: absolute; top:750px; left:1640px; display:inline; font-size: 20px;">{% for param in feature_name_list[4] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:700px; left:1880px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="6" {{cf_checkbox_list[5]}}>
+                  <strong style="position: absolute; top:750px; left:1840px; display:inline; font-size: 20px;">{% for param in feature_name_list[5] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:700px; left:2080px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="7" {{cf_checkbox_list[6]}}>
+                  <strong style="position: absolute; top:750px; left:2040px; display:inline; font-size: 20px;">{% for param in feature_name_list[6] %}{{param}}<br>&nbsp{% endfor %}</strong>
+                  <input style="position: absolute; top:700px; left:2280px; display:inline; height: 25px; width: 25px;" type="checkbox" name="check" onclick="onlyOne(this)" value="8" {{cf_checkbox_list[7]}}>
+                  <strong style="position: absolute; top:750px; left:2240px; display:inline; font-size: 20px;">{% for param in feature_name_list[7] %}{{param}}<br>&nbsp{% endfor %}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </form>
+
+
+    <form action="{{url_for('save_result')}}" method="post" autocomplete="off">
+      <div class="row">
+        {% if graph_mask[0] %}
+        <div class="col-lg-1"></div>
+        <div class="col-lg-10" style="display: inline-block;">
+          <div class="col-lg-12" style="display: inline-block;">
+            <input type="hidden" name="n" value="{{n}}">
+            <input type="submit" style="position: absolute; top:-1070px; left: 2100px; font-size: 32px; font-weight: bold; height:80px; width:300px; color: red; border-style: solid; border-width: 5px; border-radius: 20px; border-color: black;" value="Save"> 
+            <table>
+              <tr>
+                <h3 style="margin-left: 20px; display:inline-block;">Real Value</h3>
+
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="1" {{checkbox_list[0]}}>&nbsp; {{patient_info[0]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="2" {{checkbox_list[1]}}>&nbsp; {{patient_info[1]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="3" {{checkbox_list[2]}}>&nbsp; {{patient_info[2]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="4" {{checkbox_list[3]}}>&nbsp; {{patient_info[3]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="5" {{checkbox_list[4]}}>&nbsp; {{patient_info[4]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="6" {{checkbox_list[5]}}>&nbsp; {{patient_info[5]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="7" {{checkbox_list[6]}}>&nbsp; {{patient_info[6]}}</td> 
+                <td><input style="height: 15px; width: 15px;" type="checkbox" name="hide" value="8" {{checkbox_list[7]}}>&nbsp; {{patient_info[7]}}</td> 
+              </tr>
+              <tr>
+                <td>{{feature_unit[0]}}</td>
+                <td>{{feature_unit[1]}}</td>
+                <td>{{feature_unit[2]}}</td>
+                <td>{{feature_unit[3]}}</td>
+                <td>{{feature_unit[4]}}</td>
+                <td>{{feature_unit[5]}}</td>
+                <td>{{feature_unit[6]}}</td>
+                <td>{{feature_unit[7]}}</td>
+              </tr>
+            </table>
+
+            <h3 style="margin-left: 35px; margin-top: 20px;">Explanation</h3>
+            <textarea name="text1" style="margin-left: 35px;" rows="12" cols="100">{{txtbox_1}}</textarea>
+
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </form
+
+
+
+    <!-- Draw graphs -->
+    <script>
+        
+      function onlyOne(checkbox) {
+        var checkboxes = document.getElementsByName('check')
+        checkboxes.forEach((item) => {
+          if (item !== checkbox) item.checked=false
+        })
+      }
+
+      var timeFormat = 'YYYY';
+      var cf_config_1 = {
+        type: 'bar',
+        data: {
+          labels: [
+            "ŷ",
+            "ŷ_cf",
+          ], 
+          datasets: [{
+            label: '',
+            data: [{{cf_value1}},
+                   {{cf_value2}},
+            ],
+            backgroundColor: [
+              "rgba(255, 205, 86)",  
+              "rgba(54, 162, 235)",
+            ],
+            borderColor: [
+              "rgb(255, 205, 86)",  
+              "rgb(54, 162, 235)",
+            ],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontSize: 36,
+                autoSkip: false,
+              },
+              maxBarThickness: 80,
+            }],
+            yAxes: [{
+                ticks: {
+                    fontSize: 24,
+                    beginAtZero: true,
+                    max: {{feature_contrib_max}},
+                    maxTicksLimit: 5,
+                }
+            }],
+          },
+          tooltips: {
+            titleFontSize: 20,
+            bodyFontSize: 20
+          },
+          responsive: false,
+          hover: {
+            mode: 'nearest'
+          },
+          legend: {
+            display: false
+          }
+        }
+      };
+
+
+
+
+
+      // Bar graph (Feature Contribution)
+      var config_1 = {
+        type: 'bar',
+        data: {
+          labels: [
+            [{% for param in feature_name_list[0] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[1] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[2] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[3] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[4] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[5] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[6] %}'{{param}}',{% endfor %}],
+            [{% for param in feature_name_list[7] %}'{{param}}',{% endfor %}],
+          ], 
+          datasets: [{
+            label: '',
+            data: {{feature_contrib_list[:8]}},
+            backgroundColor: [
+              "rgba(255, 99, 132)",
+              "rgba(255, 159, 64)",
+              "rgba(255, 205, 86)",
+              "rgba(75, 192, 192)",
+              "rgba(54, 162, 235)",
+              "rgba(153, 102, 255)",
+              "rgba(201, 203, 207)",
+            ],
+            borderColor: [
+              "rgb(255, 99, 132)",
+              "rgb(255, 159, 64)",
+              "rgb(255, 205, 86)",
+              "rgb(75, 192, 192)",
+              "rgb(54, 162, 235)",
+              "rgb(153, 102, 255)",
+              "rgb(201, 203, 207)",
+            ],
+            // borderColor: '#a9a9a9',
+            // backgroundColor: '#f1f1f1',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            xAxes: [{
+              ticks: {
+                fontSize: 18,
+                autoSkip: false
+              }
+            }],
+            yAxes: [{
+                ticks: {
+                    fontSize: 18,
+                    beginAtZero: true,
+                    max: {{feature_contrib_max}}
+                }
+            }],
+          },
+          tooltips: {
+            titleFontSize: 20,
+            bodyFontSize: 20
+          },
+          responsive: false,
+          hover: {
+            mode: 'nearest'
+          },
+          legend: {
+            position: 'top',
+            labels: {
+              fontSize : 24,
+              generateLabels: function(chart) {
+                return [
+                  {text: 'Attention (%)', strokeStyle:'gray', fillStyle: 'white'},
+                ]
+              }    
+            }
+          }
+        }
+      };
+
+    
+      window.onload = function () {
+        {% if graph_mask[0] %} var ctx_1 = document.getElementById("canvas_1").getContext("2d") {% endif %};
+        {% if graph_mask[0] %} var cf_ctx_1 = document.getElementById("cf_canvas_1").getContext("2d") {% endif %};
+
+
+        {% if graph_mask[0] %} window.myLine = new Chart(ctx_1, config_1) {% endif %};
+        {% if graph_mask[0] %} window.myLine = new Chart(cf_ctx_1, cf_config_1) {% endif %};
+      };
+    </script>
+
+  </body>
+</html>
+
+

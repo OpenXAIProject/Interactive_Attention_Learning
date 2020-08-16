@@ -1,0 +1,12 @@
+<html>
+  <body>
+    <form action="{{url_for('patient_search')}}" method="get" autocomplete="off">
+      <input type="hidden" id="n" name="n" value="0">
+      <input type="hidden" id="y" name="y" value="0">
+      <input type="submit" style="margin-top: 50px; margin-left: 50px; width: 200px; height: 100px; font-size: 36px" value="Start">
+    </form>
+  </body>
+</html>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/autocomplete.js') }}"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/autocomplete.css') }}">
